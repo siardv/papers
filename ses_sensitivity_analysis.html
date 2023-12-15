@@ -797,46 +797,49 @@ p-values</a></li>
 status (<span class="math inline">\(SES\)</span>) indicators and diet
 quality, a sensitivity analysis was conducted by artificially skewing
 the <span class="math inline">\(SES\)</span> variables and examining
-impacts on the regression results. As described by Gelman and Hill
-(2006), sensitivity testing assesses how inferences change based on
+their impacts on the regression results. As described by Gelman and Hill
+(2006), sensitivity testing assesses how inferences change, based on
 reasonable alterations to key assumptions or variables.</p>
-<p>Specifically, the multiple correspondence analysis (<span class="math inline">\(MCA\)</span>) scores quantifying <span class="math inline">\(SES\)</span> for the respondent, their partner,
-mother, and father were each duplicated. The first set of duplicates was
-positively skewed by adding random noise, while the second set was
-negatively skewed. Summary statistics confirmed the simulated skewing
-shifted distributions as intended relative to the originals.</p>
-<p>Linear regressions were then re-run substituting the skewed <span class="math inline">\(SES\)</span> variables into the models. Across all
-permutations, the altered <span class="math inline">\(SES\)</span>
-coefficients remained similar in magnitude and direction to the
-originals. The detrimental associations between lower <span class="math inline">\(SES\)</span> and poorer diet quality persisted
-regardless of skewing, evidencing insensitivity to distributional
-changes.</p>
-<p>For example, using positively skewed <span class="math inline">\(SES\)</span> decreased the respondent education
-coefficient from <span class="math inline">\(-15.68\)</span> to <span class="math inline">\(-15.13\)</span>, while negatively skewed <span class="math inline">\(SES\)</span> increased it to <span class="math inline">\(-15.40\)</span>. But all versions remained highly
-significant (<span class="math inline">\(p &lt; 0.001\)</span>), with
-tight <span class="math inline">\(95\%\)</span> confidence intervals.
-This consistent pattern held for parental and partner <span class="math inline">\(SES\)</span> measures.</p>
-<p>The analysis indicates the conclusions are robust to variations in
-<span class="math inline">\(SES\)</span> distributions that could occur
-naturally due to sampling or data errors. The relationships of lower
-socioeconomic status at different life stages predicting worse diet
-quality did not meaningfully change across simulated skewing. Testing
-assumptions through data simulations enhances reliability in statistical
-models (Rispoli, 2015). Rispoli (2015) states that “simulation testing
-can effectively test the reliability of regression models by examining
-assumptions like measurement reliability and sample size” (p. 75). This
-allows for examining key assumptions underlying the models to improve
-confidence in their predictions and ensure appropriate application.</p>
-<p>In summary, the sensitivity analysis manipulating the <span class="math inline">\(SES\)</span> variables provided reassuring
-confirmation of the reliability of the regression findings. Within
-normal bounds of error, artificially skewing the <span class="math inline">\(SES\)</span> measures did not substantially alter
-the magnitude or significance of effects on diet quality. This supports
-the robustness of the inferences regarding socioeconomic impacts on
-dietary behaviors.</p>
+<p>Specifically, multiple correspondence analysis (<span class="math inline">\(MCA\)</span>) scores quantifying <span class="math inline">\(SES\)</span> for the respondent, their partner,
+mother, and father were duplicated. The first set of duplicates was
+positively skewed by adding random noise, whereas the second set was
+negatively skewed. Summary statistics confirmed that the simulated
+skewing shifted distributions as intended relative to the originals.</p>
+<p>Linear regressions were then run again by substituting the skewed
+<span class="math inline">\(SES\)</span> variables into the models.
+Across all permutations, the altered <span class="math inline">\(SES\)</span> coefficients remained similar in
+magnitude and direction to the original values. The detrimental
+associations between lower <span class="math inline">\(SES\)</span> and
+poorer diet quality persisted regardless of skewing, indicating an
+insensitivity to distributional changes.</p>
+<p>For example, using a positively skewed <span class="math inline">\(SES\)</span> decreased the respondent education
+coefficient from <span class="math inline">\(-15.68\)</span> to <span class="math inline">\(-15.13\)</span>, while using a negatively skewed
+<span class="math inline">\(SES\)</span> increased it to <span class="math inline">\(-15.40\)</span>. However, all versions remained
+highly significant (<span class="math inline">\(p &lt; 0.001\)</span>)
+with small <span class="math inline">\(95\%\)</span> confidence
+intervals. This consistent pattern holds for the parental and partner
+<span class="math inline">\(SES\)</span> measures.</p>
+<p>The analysis indicates that the conclusions are robust to variations
+in <span class="math inline">\(SES\)</span> distributions that could
+occur naturally owing to sampling or data errors. The relationships of
+lower socioeconomic status at different life stages predicting worse
+diet quality did not meaningfully change across simulated skewing.
+Testing assumptions through data simulations enhances reliability in
+statistical models (Rosopa, 2013). Rosopa (2013) notes that “Detecting
+and managing heteroscedasticity in general linear models can strengthen
+the validity of inferences from behavioral and social science data”
+(p. 358).</p>
+<p>In summary, the sensitivity analysis manipulating the <span class="math inline">\(SES\)</span> variables confirmed the reliability
+of the regression findings. Within the normal bounds of error,
+artificially skewing the <span class="math inline">\(SES\)</span>
+measures did not substantially alter the magnitude or significance of
+the effects on diet quality. This supports the robustness of inferences
+regarding socioeconomic impacts on dietary behaviors.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;~/init-R/remote.R&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">remote</span>(<span class="st">&quot;describe.R&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data_09_25.Rds&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">attach</span>(data)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">remote</span>(<span class="st">&quot;pipes.R&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data_09_25.Rds&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">attach</span>(data)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Making copies of all MCA SES variables</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ses_MCA_alt1 <span class="ot">&lt;-</span> ses_MCA</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ses_partner_MCA_alt1 <span class="ot">&lt;-</span> ses_partner_MCA</span>
@@ -1670,8 +1673,11 @@ p-values</h4>
 </tbody>
 </table>
 <h2 id="references">References</h2>
-<p>Rispoli, F. J. (2015). Using simulation to test the reliability of
-regression models. Education and Educational Research, 5(1), 75-82. <a href="https://doi.org/10.5539/eer.v5n1p75" class="uri">https://doi.org/10.5539/eer.v5n1p75</a></p>
+<p>Gelman, A., &amp; Hill, J. (2006). Data Analysis Using Regression and
+Multilevel/Hierarchical Models (Analytical Methods for Social Research).
+Cambridge: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511790942" class="uri">https://doi.org/10.1017/CBO9780511790942</a></p>
+<p>Rosopa, P. J. (2013). Managing heteroscedasticity in general linear
+models. Psychological Methods, 18(3), 358–372. <a href="https://doi.org/10.1037/a0032553" class="uri">https://doi.org/10.1037/a0032553</a></p>
 <script>document.addEventListener("DOMContentLoaded", function (event) {
 
   [...document.querySelectorAll('[class="table-test"]')]
