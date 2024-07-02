@@ -1,0 +1,57 @@
+body {
+  max-width: 80vw;
+/* remove any background color set by other style sheets*/
+  background-color: transparent !important;
+}
+
+code, pre {
+  text-wrap: pretty !important;
+}
+
+.code-folding-btn {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: #a80000;
+  text-align: left;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: list-item;
+}
+
+.code-folding-btn:hover {
+  text-decoration: underline;
+}
+
+.sourceCode {
+  transition: max-height 0.5s ease-in-out;
+}
+
+::-webkit-scrollbar {
+  /* display: none; */
+}
+
+.scroll_box {
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.subscript {
+  vertical-align: baseline;
+  font-size: small;
+}
+
+.table-test,
+.table-test > tbody > tr:first-child > td,
+.table-test > tbody > tr:first-child > th {
+  border: none !important;
+}
+
+table > caption {
+  /* width: max-content;*/
+}

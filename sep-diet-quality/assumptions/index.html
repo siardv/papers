@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Siard van den Bosch" />
+  <title>Robust Regression Assumption Testing (unadjusted)</title>
+
+<style type="text/css" charset="utf-8">
+/* cleanrmd basic defaults */
+body {
+  /* at least one is usually overridden by the theme, but these ensure the
+  body doesn't go all the way up to the screen edge */
+  margin: 0.5em auto;
+  padding: 0.5em;
+  max-width: 48em;
+}
+code, code * { font-family: inherit; }
+
+@media only screen and (max-width: 768px) {
+  body { max-width: 100%; }
+}
+</style>
+
+
+  <link href="../site_libs/cleanrmd-0.1.1/latex.css" rel="stylesheet" />
+  <script src="../site_libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+  <link href="../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+  <script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <link href="../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+  <script src="../site_libs/datatables-binding-0.33/datatables.js"></script>
+  <script src="../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+  <script src="../site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+  <link href="../site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+  <script src="../site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+<style type="text/css" charset="utf-8">
+/* cleanrmd overrides */
+img { max-width: 100%; }
+</style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: auto;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { color: #00769e; background-color: #f1f3f5; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span { color: #00769e; } /* Normal */
+code span.al { color: #ad0000; } /* Alert */
+code span.an { color: #5e5e5e; } /* Annotation */
+code span.at { color: #657422; } /* Attribute */
+code span.bn { color: #ad0000; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #00769e; } /* ControlFlow */
+code span.ch { color: #20794d; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #5e5e5e; } /* Comment */
+code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+code span.dt { color: #ad0000; } /* DataType */
+code span.dv { color: #ad0000; } /* DecVal */
+code span.er { color: #ad0000; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #ad0000; } /* Float */
+code span.fu { color: #4758ab; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #5e5e5e; } /* Information */
+code span.kw { color: #00769e; } /* Keyword */
+code span.op { color: #5e5e5e; } /* Operator */
+code span.ot { color: #00769e; } /* Other */
+code span.pp { color: #ad0000; } /* Preprocessor */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
+code span.ss { color: #20794d; } /* SpecialString */
+code span.st { color: #20794d; } /* String */
+code span.va { color: #111111; } /* Variable */
+code span.vs { color: #20794d; } /* VerbatimString */
+code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+</style>
+<script>
+// remove everything from pandoc code styles _except_ for 'code span' colors
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      if (/^code span/.test(rule.selectorText)) {
+        j++;
+        continue;
+      }
+      sheets[i].deleteRule(j);
+    }
+  }
+})();
+</script>
+
+<style>
+code, pre { overflow: auto; }
+pre code, pre code:not([class]) { white-space: unset; }
+</style>
+
+<link rel="stylesheet" href="../style.css" />
+
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+<body>
+
+
+<main>
+<header>
+<h1 id="title" class="toc-ignore">Robust Regression Assumption Testing
+(unadjusted)</h1>
+<p id="author">Siard van den Bosch</p>
+
+</header>
+<ul>
+<li><a href="#assumption-testing-for-robust-regression-models"
+id="toc-assumption-testing-for-robust-regression-models">Assumption
+Testing for Robust Regression Models</a>
+<ul>
+<li><a href="#normality-of-errors"
+id="toc-normality-of-errors">Normality of Errors</a></li>
+<li><a href="#homoscedasticity"
+id="toc-homoscedasticity">Homoscedasticity</a></li>
+<li><a href="#linearity" id="toc-linearity">Linearity</a></li>
+<li><a href="#independence-of-errors"
+id="toc-independence-of-errors">Independence of Errors</a></li>
+<li><a href="#multicollinearity"
+id="toc-multicollinearity">Multicollinearity</a></li>
+<li><a href="#model-specification" id="toc-model-specification">Model
+Specification</a></li>
+<li><a href="#influential-observations"
+id="toc-influential-observations">Influential Observations</a></li>
+</ul></li>
+</ul>
+
+<script src="../script.js"></script>
+<h1 id="assumption-testing-for-robust-regression-models">Assumption
+Testing for Robust Regression Models</h1>
+<h2 id="normality-of-errors">Normality of Errors</h2>
+<p>The normality of errors represents a prevalent assumption in
+statistical analyses. Violating this assumption can invalidate
+inferences derived from the model. However, robust regression techniques
+such as MM-estimation exhibit less sensitivity to deviations from
+normality than ordinary least squares (Kudraszow et al., 2010;
+Salibian-Barrera et al., 2006).</p>
+<p>We evaluated the normality of the errors by examining Normal Q-Q
+plots (Figure 1). An approximately linear pattern in these plots
+indicated that the errors adhered to a normal distribution.
+Additionally, we implemented formal normality tests, including the
+Anderson-Darling, Shapiro-Wilk, Lilliefors, and Cramer-von Mises tests
+(Table 1). Low <span class="math inline">\(p\)</span>-values (p ≤ 0.05)
+from these tests imply departure from normality.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">c</span>(<span class="st">&quot;The low probabilities ($p </span><span class="sc">\\</span><span class="st">le 0.05$) demonstrated in these statistical results provide evidence against the null hypothesis of normality in the residuals of the evaluated regression models.&quot;</span>, <span class="st">&quot;Normality is a favorable assumption for these methods.&quot;</span>, <span class="st">&quot;Specifically, the Anderson-Darling, Shapiro-Wilk, Lilliefors, and Cramer-von Mises tests are variations of normality tests that evaluate whether a sample of data adheres to a normal distribution.&quot;</span>, <span class="st">&quot;These tests differ in their precise specifications of null and alternative hypotheses as well as in the mathematical weightings applied during the measurement of deviations from the expected normal curve.&quot;</span>), <span class="at">collapse =</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Normality tests for residuals of robust regression models&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Anderson-Darling&quot;</span>, <span class="st">&quot;Shapiro-Wilk&quot;</span>, <span class="st">&quot;Lilliefors (Kolmogorov-Smirnov)&quot;</span>, <span class="st">&quot;Cramer-von Mises&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>normality_tests_data_frame <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2_dfr</span>(<span class="fu">seq_along</span>(.), <span class="sc">~</span> <span class="fu">data.frame</span>(.y, <span class="fu">normality_tests</span>(.x)))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>normality_tests_table <span class="ot">&lt;-</span> knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  normality_tests_data_frame,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">&quot;html&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> column_names</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> kableExtra<span class="sc">::</span><span class="fu">footnote</span>(footnote_text, <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combined_qq_plot</span>(lmrob_fits, <span class="fu">as.list</span>(<span class="fu">as.character</span>(<span class="fu">seq_along</span>(lmrob_fits))),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot_title =</span> <span class="st">&quot;Normal Q-Q plots for robust regression models (MM-estimation)&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figure-html5/normal_qq_plots-1.svg" alt="Normal Q-Q plots for robust regression models" width="1440" background-color:transparent />
+<p class="caption">
+Normal Q-Q plots for robust regression models
+</p>
+</div>
+<p>The Q-Q plots and normality tests indicate that the errors are
+approximately normally distributed for most of the models. However, a
+limitation is that normality tests can be sensitive to sample size, with
+even small departures flagged as significant in large samples (Razali
+&amp; Wah, 2011).</p>
+<h2 id="homoscedasticity">Homoscedasticity</h2>
+<p>The assumption of homoscedasticity, that the errors exhibit constant
+variance across predicted values, was evaluated. Although robust
+regression techniques demonstrate increased resilience to
+heteroscedastic errors, assessing this assumption remains prudent
+(Western et al. 1995). Homoscedasticity was examined using
+scale-location plots and the Breusch-Pagan test. Scale-Location plots
+graph the square root of standardized residuals against fitted values; a
+horizontal distribution of randomly dispersed data points lends support
+to homoscedasticity. The Breusch-Pagan test compares residual variances
+across predictor ranges, with low p-values (p ≤ 0.05) indicating
+heteroscedasticity. Scale-Location plots (Figure 2) depicted a
+horizontal alignment of residuals, and the Breusch-Pagan statistic
+(Table 2).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Scale-Location plots for robust regression models&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Statistic&quot;</span>, <span class="st">&quot;$p$-value&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">c</span>(p_value_note, <span class="st">&quot;Low probability ($p </span><span class="sc">\\</span><span class="st">le 0.05$) means the null hypothesis is rejected in favor of heteroscedastic residuals, violating the favorable assumption of homoscedasticity.&quot;</span>), <span class="at">collapse =</span> <span class="st">&quot; &quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Breusch-Pagan test for heteroscedasticity</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>bptest_results <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2_dfr</span>(<span class="fu">seq_along</span>(.), <span class="sc">~</span> {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> lmtest<span class="sc">::</span><span class="fu">bptest</span>(.x)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">Model =</span> .y, <span class="at">Statistic =</span> x<span class="sc">$</span>statistic, <span class="at">p_value =</span> <span class="fu">format_p_value</span>(x<span class="sc">$</span>p.value, <span class="cn">TRUE</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a table with the results</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  bptest_results,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">align =</span> <span class="st">&quot;l&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> column_names</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> kableExtra<span class="sc">::</span><span class="fu">footnote</span>(footnote_text, <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Scale-Location plots for robust regression models
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Statistic
+</th>
+<th style="text-align:left;">
+<span class="math inline">\(p\)</span>-value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0.6198
+</td>
+<td style="text-align:left;">
+0.431
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1.5466
+</td>
+<td style="text-align:left;">
+0.672
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+4.5548
+</td>
+<td style="text-align:left;">
+0.336
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+5.0834
+</td>
+<td style="text-align:left;">
+0.650
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+15.6417
+</td>
+<td style="text-align:left;">
+0.269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+17.2847
+</td>
+<td style="text-align:left;">
+0.241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+31.3019
+</td>
+<td style="text-align:left;">
+0.116
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+31.3019
+</td>
+<td style="text-align:left;">
+0.116
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+38.3315
+</td>
+<td style="text-align:left;">
+0.092
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> <span
+class="math inline">\(^{***}p \lt 0.001\)</span> <span
+class="math inline">\(^{**}p \le 0.01\)</span> <span
+class="math inline">\(^{*}p \le 0.05\)</span> Low probability (<span
+class="math inline">\(p \le 0.05\)</span>) means the null hypothesis is
+rejected in favor of heteroscedastic residuals, violating the favorable
+assumption of homoscedasticity.
+</td>
+</tr>
+</tfoot>
+</table>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="at">.y =</span> <span class="fu">beautify_names</span>(<span class="fu">names</span>(.)), <span class="sc">~</span> <span class="fu">scale_location_plot</span>(.x, .y)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> ., <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figure-html5/scale_location_plots-1.svg" alt="Scale-Location plots for robust regression models" width="2160" background-color:transparent />
+<p class="caption">
+Scale-Location plots for robust regression models
+</p>
+</div>
+<p>Examinations of scale-location plots and Breusch-Pagan tests were
+conducted to assess heteroscedasticity and homoscedasticity assumptions
+for the models under analysis. The scale-location plots graphically
+depict the spread of residuals across the range of predicted values.
+Breusch-Pagan tests provide a statistical test for the presence of
+heteroscedasticity.</p>
+<h2 id="linearity">Linearity</h2>
+<p>Linearity is the assumption that the relationship between the
+predictors and response variable is linear. Nonlinear relationships can
+bias the model results, even when using a robust estimation. It is
+important to check for linearity before conducting an analysis (Özdemir
+et al., 2021).</p>
+<p>Linearity was assessed using component and partial residual plots
+(not shown). These plots display the relationship between each predictor
+and the residuals or partial residuals (residuals plus predictor
+effect). The nonlinear pattern in these plots suggests violation of the
+linearity assumption. The transformation of the predictors may be
+necessary to achieve linearity.</p>
+<h2 id="independence-of-errors">Independence of Errors</h2>
+<p>The assumption of error independence, also known as the absence of
+autocorrelation, suggests a lack of correlation between the errors.
+Autocorrelated errors can inflate the observed variability and distort
+the statistical inferences derived from the model (Darwish et al.,
+2015).</p>
+<p>We tested for independence of errors utilizing the Durbin-Watson test
+(Table 3). This test compares the residuals from adjacent observations,
+with <span class="math inline">\(p\)</span>-values less than 0.05
+indicating significant autocorrelation.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Durbin-Watson test for independence of errors&quot;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Statistic&quot;</span>, <span class="st">&quot;$p$-value&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;The alternative hypothesis (when $p </span><span class="sc">\\</span><span class="st">le 0.05$) indicates the presence&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;of autocorrelation in the residuals (or disturbances) of the model.&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Autocorrelation violates the assumption of independent errors,&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;which is necessary for unbiased and efficient parameter estimates.&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<!-- ::: show-code -->
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function to perform Durbin-Watson test</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>perform_dw_test <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, model_name) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  dw_result <span class="ot">&lt;-</span> lmtest<span class="sc">::</span><span class="fu">dwtest</span>(fit)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Model =</span> model_name,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Statistic =</span> dw_result<span class="sc">$</span>statistic,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_value =</span> <span class="fu">format_p_value</span>(dw_result<span class="sc">$</span>p.value, <span class="cn">TRUE</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to each model fit using purrr::map2_dfr</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>dw_test_results <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2_dfr</span>(<span class="fu">seq_along</span>(.), perform_dw_test)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a kable table with the results</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  dw_test_results,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">&quot;html&quot;</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> column_names</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">footnote</span>(footnote_text, <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Durbin-Watson test for independence of errors
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Statistic
+</th>
+<th style="text-align:left;">
+<span class="math inline">\(p\)</span>-value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1.9754
+</td>
+<td style="text-align:left;">
+0.319
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1.9769
+</td>
+<td style="text-align:left;">
+0.328
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1.9711
+</td>
+<td style="text-align:left;">
+0.289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1.9719
+</td>
+<td style="text-align:left;">
+0.292
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1.9755
+</td>
+<td style="text-align:left;">
+0.315
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+1.9708
+</td>
+<td style="text-align:left;">
+0.283
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+1.9752
+</td>
+<td style="text-align:left;">
+0.311
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+1.9752
+</td>
+<td style="text-align:left;">
+0.311
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+1.9958
+</td>
+<td style="text-align:left;">
+0.451
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> The
+alternative hypothesis (when <span class="math inline">\(p \le
+0.05\)</span>) indicates the presence of autocorrelation in the
+residuals (or disturbances) of the model. Autocorrelation violates the
+assumption of independent errors, which is necessary for unbiased and
+efficient parameter estimates.
+</td>
+</tr>
+</tfoot>
+</table>
+<!-- ::: -->
+<p>The Durbin-Watson tests is not reliable for all types of dependence
+and has low power in small samples (Durbin &amp; Watson, 1950).</p>
+<h2 id="multicollinearity">Multicollinearity</h2>
+<p>The assumption of non-multicollinearity among the predictors was
+evaluated. Multicollinearity occurs when independent variables exhibit
+high degrees of intercorrelation, which can impede model estimation.
+Even when imperfect, elevated multicollinearity can inflate standard
+errors and induce instability in coefficients (Prahutama et al., 2021).
+Multicollinearity was diagnosed by examining the variance inflation
+factors (VIFs) derived from the MTest, as presented in Table 4. VIFs
+exceeding 10 are generally indicative of potentially problematic
+multi-collinearity.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the file path and name for the VIF data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vif_file <span class="ot">&lt;-</span> <span class="st">&quot;vif_df.RData&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the VIF data file exists</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(vif_file)) {</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Load the existing VIF data</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">load</span>(<span class="at">file =</span> vif_file)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate the VIF values</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  vif_df <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%$%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">seq_along</span>(.),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sapply</span>(., calculate_max_vif, <span class="at">nboot =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save</span>(vif_df, <span class="at">file =</span> vif_file)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="st">&quot;$^a$ Only the largest VIF (Variance Inflation Factor) value is reported for each model.&quot;</span>, <span class="st">&quot;VIF values greater than 10 indicate multicollinearity, which can lead to biased and inefficient parameter estimates.&quot;</span>), <span class="at">collapse =</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Max VIF$^a$&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Variance inflation factors (VIFs) for assessing multicollinearity&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  vif_df,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">&quot;html&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> column_names</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> kableExtra<span class="sc">::</span><span class="fu">footnote</span>(footnote_text, <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Variance inflation factors (VIFs) for assessing multicollinearity
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Max VIF<span class="math inline">\(^a\)</span>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1.3281
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1.3319
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1.5733
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1.2620
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+1.7585
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+1.2654
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+1.2654
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+1.3103
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> <span
+class="math inline">\(^a\)</span> Only the largest VIF (Variance
+Inflation Factor) value is reported for each model. VIF values greater
+than 10 indicate multicollinearity, which can lead to biased and
+inefficient parameter estimates.
+</td>
+</tr>
+</tfoot>
+</table>
+<h2 id="model-specification">Model Specification</h2>
+<p>Even if all other assumptions are met, the model can be misleading if
+it is not properly specified. Omitted variable bias, incorrect
+functional form, and other specification errors can invalidate the
+conclusions. The RESET test can help detect general model
+misspecification (Ramsey, 1969).</p>
+<p>We performed the RESET test for each model (Table 5). This test adds
+powers of the fitted values to the model and checks if they
+significantly improve the fit. Low p-values (p ≤ 0.05) indicate
+potential misspecification, suggesting that the model could be improved
+by incorporating nonlinear terms.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Ramsey&#39;s RESET test for model specification&quot;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Statistic&quot;</span>, <span class="st">&quot;df1&quot;</span>, <span class="st">&quot;df2&quot;</span>, <span class="st">&quot;$p$-value&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;The Ramsey Regression Specification Error Test (RESET) evaluates the functional form of a model by testing the null hypothesis that the model is specified correctly.&quot;</span>, <span class="st">&quot;Significance values below the 0.05 significance level suggest improved model fit could be obtained by incorporating nonlinear terms, implying that the existing model may be misspecified.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform the RESET test and create a data frame</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>reset_test_results <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">seq_along</span>(.),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> {</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      test_result <span class="ot">&lt;-</span> lmtest<span class="sc">::</span><span class="fu">resettest</span>(.x)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">data.frame</span>(</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">Model =</span> .y,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">Statistic =</span> test_result<span class="sc">$</span>statistic,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">df1 =</span> test_result<span class="sc">$</span>parameter[<span class="dv">1</span>],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">df2 =</span> test_result<span class="sc">$</span>parameter[<span class="dv">2</span>],</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format_p_value</span>(test_result<span class="sc">$</span>p.value, <span class="cn">TRUE</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_rows</span>()</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a kable table with the results</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> reset_test_results,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">&quot;html&quot;</span>,</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> column_names</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> kableExtra<span class="sc">::</span><span class="fu">footnote</span>(footnote_text, <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Ramsey’s RESET test for model specification
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Model
+</th>
+<th style="text-align:right;">
+Statistic
+</th>
+<th style="text-align:right;">
+df1
+</th>
+<th style="text-align:right;">
+df2
+</th>
+<th style="text-align:left;">
+<span class="math inline">\(p\)</span>-value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.4567
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1440
+</td>
+<td style="text-align:left;">
+0.233
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0018
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1438
+</td>
+<td style="text-align:left;">
+0.998
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0.4290
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1437
+</td>
+<td style="text-align:left;">
+0.651
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0.2669
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:left;">
+0.766
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0.2801
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1428
+</td>
+<td style="text-align:left;">
+0.756
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0.3656
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1427
+</td>
+<td style="text-align:left;">
+0.694
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+1.4640
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1418
+</td>
+<td style="text-align:left;">
+0.232
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+1.4640
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1418
+</td>
+<td style="text-align:left;">
+0.232
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+2.7470
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1413
+</td>
+<td style="text-align:left;">
+0.064
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> The Ramsey
+Regression Specification Error Test (RESET) evaluates the functional
+form of a model by testing the null hypothesis that the model is
+specified correctly.Significance values below the 0.05 significance
+level suggest improved model fit could be obtained by incorporating
+nonlinear terms, implying that the existing model may be misspecified.
+</td>
+</tr>
+</tfoot>
+</table>
+<p>The RESET test, originally proposed by Ramsey in 1969, is considered
+an omnibus test because it can detect various forms of model
+misspecification all at once. Specifically, it tests the null hypothesis
+that the model is correctly specified in terms of its linearity and
+functional form. Rejecting this null hypothesis suggests some kind of
+misspecification, but the test itself does not indicate what exactly is
+wrong with the model.</p>
+<p>This is because mathematically, the RESET test works by adding
+polynomial terms of the fitted values to the original model as extra
+regressors. The intuition is that if the original model is properly
+specified, these extra terms should not have much explanatory power and
+should be statistically insignificant. However, if the model is
+misspecified in some manner, these terms may end up being significant as
+they start to proxy for the mis-specification.</p>
+<p>The downside is that since the added terms are just polynomials of
+the fitted values, they can pick up many different kinds of departures
+from the original model. So a rejection of the null only signals that
+something is wrong, but does not diagnose the specific problems like
+non-linear relationships, omitted variables, incorrect functional form,
+etc. The mathematical structure essentially casts a wide net to detect
+model misspecification in general, rather than targeting specific
+alternatives.</p>
+<p>In summary, the RESET test is omnibus in nature, allowing it to catch
+multiple forms of misspecification at once, but unable to pinpoint the
+exact issues within the model. Other diagnostics are needed to further
+investigate the source of any detected model deficiencies.</p>
+<h2 id="influential-observations">Influential Observations</h2>
+<p>Certain data points have the potential to exert a disproportionate
+impact on the estimation of model parameters. Such observations,
+referred to as influential observations, can encompass outliers, data
+with high leverage values, or instances containing large residuals
+(Smucler et al., 2017). Although robust regression techniques aim to
+constrain the influence of outliers, these methods are not immune to the
+effects of influential observations.</p>
+<p>To identify potentially influential observations, we examined Cook’s
+distance plots (Figure 3) and leverage plots (Figure 4). Cook’s distance
+quantifies the alteration to fitted values when each observation is
+excluded from the model. Values exceeding 0.5 may suggest an influential
+data point. Leverage measures the distance of an observation from the
+center of the predictor space, with observations of high leverage
+capable of strongly influencing the estimated coefficients. Influential
+observations were investigated through visual analysis of these
+diagnostic tools.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="fu">beautify_names</span>(<span class="fu">names</span>(.)), <span class="sc">~</span> <span class="fu">cooks_distance_plot</span>(.x, data_2, .y)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> ., <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figure-html5/cooks_distance_plots-1.svg" alt="Cook's distance plots for influential observations" width="2160" background-color:transparent />
+<p class="caption">
+Cook’s distance plots for influential observations
+</p>
+</div>
+<p>Excluding potentially influential observations is crucial because
+they may introduce bias and impede accurate inferences. To assess the
+model’s sensitivity, suspicious outlier observations were removed and
+the models were re-estimated. The Akaike Information Criterion (AIC) was
+used to compare the models, with smaller values indicating a better fit.
+By systematically evaluating the impact of excluding observations on
+model performance, sensitivity analyses can determine whether exclusion
+significantly enhances model estimates or primarily distorts
+interpretations. However, the removal of influential observations should
+be approached with caution, as it may lead to the loss of valuable
+information and introduce bias.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Cook&#39;s distance threshold</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>cooks_threshold <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nrow</span>(data_2)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Cook&#39;s distance for each model</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>cooks_d <span class="ot">&lt;-</span> lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="fu">seq_along</span>(.), <span class="sc">~</span> {</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cooks_distance_df</span>(.x, data_2) <span class="sc">%&gt;%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(CooksD <span class="sc">&gt;</span> cooks_threshold)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Join the Cook&#39;s distance dataframes</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>cooks_d_df <span class="ot">&lt;-</span> cooks_d <span class="sc">%&gt;%</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="fu">seq_along</span>(.), <span class="sc">~</span> {</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(.x, <span class="fu">c</span>(<span class="st">&quot;pid&quot;</span>, .y))</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">%&gt;%</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Reduce</span>(<span class="at">f =</span> <span class="cf">function</span>(x, y) dplyr<span class="sc">::</span><span class="fu">full_join</span>(x, y, <span class="at">by =</span> <span class="st">&quot;pid&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(pid) <span class="sc">%&gt;%</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">n_models =</span> <span class="fu">rowSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(.))) <span class="sc">%&gt;%</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(dplyr<span class="sc">::</span><span class="fu">across</span>(dplyr<span class="sc">::</span><span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">round</span>(., <span class="dv">4</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(pid, n_models, dplyr<span class="sc">::</span><span class="fu">everything</span>())</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> cooks_d_df <span class="sc">%$%</span> <span class="fu">tail</span>(<span class="fu">seq_along</span>(.), <span class="sc">-</span><span class="dv">2</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>cooks_d_df[i] <span class="ot">&lt;-</span> <span class="fu">sapply</span>((cooks_d_df[i] <span class="sc">-</span> cooks_threshold) <span class="sc">*</span> <span class="dv">100</span>, round, <span class="dv">4</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>cooks_d_df[i][<span class="fu">is.na</span>(cooks_d_df[i])] <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;pid&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="fu">as.character</span>(<span class="fu">seq_along</span>(lmrob_fits)))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Summary of influential observations detected by Cook&#39;s distance for robust regression models&quot;</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;(n = &quot;</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>(cooks_d_df),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;)&quot;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<!-- ::: {#robust-with-inf-df} -->
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  cooks_d_df,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">colnames =</span> column_names,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> caption_text,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">options =</span> <span class="fu">list</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">searching =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">autoWidth =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">rownames =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">columnDefs =</span> <span class="fu">list</span>(</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="at">targets =</span> <span class="st">&quot;_all&quot;</span>, <span class="at">sortable =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4f67969d6e51cf9a4a41" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4f67969d6e51cf9a4a41">{"x":{"filter":"none","vertical":false,"caption":"<caption>Summary of influential observations detected by Cook's distance for robust regression models(n = 164)<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164"],[3,14,23,25,27,29,36,37,67,72,74,95,96,107,115,118,120,132,138,145,152,177,181,194,206,210,211,224,238,239,249,252,255,259,281,283,294,300,315,317,321,327,332,334,336,341,393,402,409,411,412,425,428,443,465,470,478,480,489,506,522,538,557,574,578,586,605,610,612,619,620,626,638,647,658,660,675,684,685,711,725,737,811,846,855,858,859,866,880,882,885,899,916,952,958,973,983,989,990,991,992,1000,1001,1014,1025,1028,1030,1038,1044,1053,1083,1086,1090,1098,1112,1125,1136,1137,1138,1141,1143,1144,1148,1150,1172,1175,1176,1177,1178,1186,1190,1195,1209,1210,1228,1238,1241,1242,1248,1250,1251,1267,1269,1271,1279,1290,1292,1293,1297,1303,1304,1313,1318,1340,1350,1353,1359,1361,1363,1372,1399,1406,1418,1433],[10,5,7,3,10,9,9,4,2,2,10,10,9,9,10,7,10,3,9,7,5,2,8,2,2,5,3,4,10,4,10,2,5,8,2,7,4,3,2,10,2,9,2,3,4,4,9,5,3,2,3,6,6,3,2,2,2,2,5,7,2,6,8,3,10,7,4,10,7,5,6,4,10,5,5,4,5,6,2,3,7,8,3,4,2,3,2,3,6,3,8,3,3,3,8,7,10,6,2,5,2,9,5,6,5,2,3,10,6,5,3,2,2,2,2,7,3,2,2,5,7,2,2,2,3,9,3,2,5,2,4,10,2,3,4,7,2,2,7,6,2,4,2,6,3,2,10,5,2,10,6,2,3,2,3,3,3,2,6,2,2,3,4,2],["0.373","","0.013","","0.373","","","","","","0.113","0.063","","","0.253","0.043","0.163","0.083","","","","","0.053","","","","","","0.063","","0.283","","","0.063","","","","","","0.263","0.023","","","","0.013","","0.153","","","","0.013","","","","","","0.053","","","","","0.133","0.053","","0.043","","","1.013","","","","0.003","0.073","0.023","0.063","","","","","","0.193","","","","","0.023","","","","0.023","","","","0.133","0.053","","0.313","","","","0.143","0.013","0.033","0.543","","","","0.303","0.163","","","","","","","","0.113","0.043","0.013","","","","0.163","","0.193","","","0.013","","","0.333","0.033","0.013","0.213","","","","0.073","0.143","","","","","","","","0.303","","","0.593","","","","","","","","","","","","","0.003","0.013"],["0.163","","0.083","","0.123","0.023","0.033","0.133","","","0.213","0.413","0.353","0.063","0.123","0.073","0.053","0.053","0.093","","","","","","0.073","","","","0.123","0.083","0.383","","0.023","","","","","","","0.363","","0.043","","","","","","","0.063","","0.073","0.003","","","","0.023","","0.013","","","","0.083","","0.163","0.503","","","0.413","","","","","0.343","0.063","","0.263","","","","0.013","0.283","0.093","","0.023","0.063","","0.033","","","0.013","","","0.093","0.003","","","1.013","0.033","0.053","","","0.183","0.073","0.153","","","","1.113","","","0.103","","","","","","0.003","","","","0.113","","","","0.013","0.063","","","0.093","0.013","0.153","0.463","","","","","","","0.263","0.163","","0.123","","","","","0.333","","","0.193","","0.003","","0.013","","","","0.023","0.003","","","","0.183",""],["0.043","","0.113","","0.023","0.053","0.053","0.153","","","0.103","0.483","0.363","0.243","0.203","","0.033","","0.103","","","","","","","","","","0.203","","0.393","","0.043","0.013","","","","","","0.163","","0.063","","","0.083","","0.013","0.123","0.043","","","0.063","","0.193","0.023","","","","","","","0.143","","0.023","0.323","0.033","","0.503","","","","","0.403","0.103","0.073","0.093","","0.043","","0.073","0.373","0.113","","","","","","","","","0.043","","0.003","","","","0.733","","","","","0.313","","","0.013","","","0.893","","","0.013","0.053","","","","0.163","","","","","0.123","","","","","0.243","","","0.243","","0.033","0.463","","0.043","","","","","0.223","0.063","","0.043","","","","","0.173","","","0.083","0.033","","","","","","","","0.053","","","","0.063",""],["0.093","","0.043","","0.083","0.123","0.093","0.023","","","0.243","1.223","0.373","0.483","0.153","","0.243","","0.213","0.013","","","0.033","","","","","0.033","0.183","","0.453","","0.033","","","0.213","","","0.033","0.113","","0.233","","","","","0.143","0.053","","","","0.093","","0.113","","","","","","0.053","","0.013","0.083","","0.323","0.113","","0.233","0.003","","","","0.433","","","0.003","","","","","0.193","0.173","","","","","","","0.013","","0.093","","","","0.103","0.093","0.773","0.053","","0.083","","0.113","0.063","","0.093","","","0.643","","","","","","","","0.063","","","","","0.173","","","","","0.233","","","0.103","","","0.513","","","","0.053","","","0.093","0.013","","0.023","","0.173","","","0.173","","0.013","0.103","0.023","","","","","","","","0.013","","","0.003","",""],["0.333","","0.063","0.053","0.663","0.133","0.133","","","","0.203","1.043","0.313","0.563","0.103","0.143","0.363","","0.163","0.203","","0.023","0.013","0.013","","0.033","","0.063","0.183","0.033","0.583","","0.003","0.093","","0.553","0.073","","","0.043","","0.153","","","","","0.143","","","","","0.043","0.123","","","","","","","0.113","","","0.233","","0.093","0.083","0.003","0.473","0.023","0.013","0.633","","0.703","","","","","","","","0.093","0.113","","","","","","","0.143","","0.223","","","","0.343","0.113","0.383","","","","","","0.023","","0.053","","","0.653","","0.043","","","","","","0.013","","","","","0.053","","","","","0.233","","","","","","0.273","","","","0.133","","","","","","","","0.033","","","0.623","0.013","","0.373","","","","","","","","","0.043","","","","",""],["0.313","0.053","0.033","0.013","0.593","0.013","0.073","","","","0.183","0.743","0.163","0.513","0.153","0.143","0.463","","0.273","0.033","0.013","","0.223","","","","","0.013","0.123","","0.803","","","0.223","","0.193","","","","0.143","","0.053","","","0.023","0.043","0.333","0.003","","","","0.033","0.103","","","","","","0.063","0.233","","","0.073","","0.143","0.083","","0.623","0.073","","0.283","","0.483","0.013","0.023","","0.083","0.103","","","0.103","0.133","","0.003","","0.003","","0.013","","","0.073","","","","0.353","0.083","0.463","0.023","","0.023","","0.113","","0.043","0.003","","","0.583","0.053","0.173","","","","","","0.143","","","","0.033","0.043","","","","","0.263","","","0.043","","","0.263","","","","0.193","","","0.033","0.013","","","","0.053","0.053","","0.673","0.063","","0.373","","","","","","0.003","","","","0.003","0.003","","",""],["0.213","0.543","","","0.553","0.073","0.103","","","","0.083","0.783","0.203","0.893","0.033","0.003","0.453","","0.393","0.083","0.033","","0.233","","","0.093","0.033","","0.053","","1.213","","","0.463","","0.283","0.073","0.023","","0.033","","0.033","","0.083","","0.183","0.403","","","","","","0.083","","","","","","0.033","0.443","","","0.163","","0.043","0.033","0.053","0.433","0.183","0.063","0.993","0.023","0.523","","","","0.073","0.083","","","","0.023","0.083","","","","","","0.083","","0.053","0.023","","","0.673","0.423","0.283","0.023","","0.013","","0.053","","0.113","","","0.033","0.603","0.263","0.163","","","","","","0.123","","","","0.043","","","","","","0.423","0.033","","","","","0.103","","","0.063","0.443","","","","","","","","0.013","","","1.063","0.143","","0.353","0.033","","0.013","","0.053","","0.013","","","","","","",""],["0.213","0.543","","","0.553","0.073","0.103","","","","0.083","0.783","0.203","0.893","0.033","0.003","0.453","","0.393","0.083","0.033","","0.233","","","0.093","0.033","","0.053","","1.213","","","0.463","","0.283","0.073","0.023","","0.033","","0.033","","0.083","","0.183","0.403","","","","","","0.083","","","","","","0.033","0.443","","","0.163","","0.043","0.033","0.053","0.433","0.183","0.063","0.993","0.023","0.523","","","","0.073","0.083","","","","0.023","0.083","","","","","","0.083","","0.053","0.023","","","0.673","0.423","0.283","0.023","","0.013","","0.053","","0.113","","","0.033","0.603","0.263","0.163","","","","","","0.123","","","","0.043","","","","","","0.423","0.033","","","","","0.103","","","0.063","0.443","","","","","","","","0.013","","","1.063","0.143","","0.353","0.033","","0.013","","0.053","","0.013","","","","","","",""],["0.393","0.363","","","0.423","0.093","0.093","","0.043","0.093","0.183","1.643","0.403","0.463","0.083","","0.163","","0.243","0.073","0.113","","0.273","","","0.243","","","0.073","0.143","1.303","0.063","","1.213","0.263","0.003","","","","0.063","","0.023","0.103","","","","0.183","0.013","","0.093","","","0.033","","","","","","0.063","0.453","0.283","0.023","0.103","","0.033","","","0.303","0.223","0.093","0.373","","0.363","","0.003","","0.203","0.143","0.003","","","","","0.113","","","","0.083","0.033","","0.063","","","","0.703","0.413","0.593","","","","","0.013","","","","0.013","","0.413","0.113","","","","0.043","0.043","0.023","","","","","0.223","0.143","0.073","","0.043","","0.333","","","","","","0.493","","","0.153","0.493","0.063","","0.063","0.033","0.013","","0.183","","0.023","0.043","0.903","","","0.323","0.013","","","","","0.073","","","0.023","","","0.023","",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>n<\/th>\n      <th>1<\/th>\n      <th>2<\/th>\n      <th>3<\/th>\n      <th>4<\/th>\n      <th>5<\/th>\n      <th>6<\/th>\n      <th>7<\/th>\n      <th>8<\/th>\n      <th>9<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"autoWidth":true,"rownames":false,"columnDefs":[{"targets":"_all","sortable":false},{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"pid","targets":1},{"name":"n_models","targets":2},{"name":"1","targets":3},{"name":"2","targets":4},{"name":"3","targets":5},{"name":"4","targets":6},{"name":"5","targets":7},{"name":"6","targets":8},{"name":"7","targets":9},{"name":"8","targets":10},{"name":"9","targets":11}],"order":[],"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<!-- ::: -->
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>footnote_text <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sprintf</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;A total of %d unique and influential observations were observed across all the models. Cook&#39;s distance measures the influence of each observation on the model. Observations with Cook&#39;s distance greater than %.3f were considered influential. The frequency of these influential observations varied across models, with a standard deviation of %.3f.&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(x), <span class="fu">round</span>(y, <span class="dv">3</span>), <span class="fu">round</span>(z, <span class="dv">3</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>caption_text <span class="ot">&lt;-</span> <span class="st">&quot;Summary of influential observations detected by Cook&#39;s distance&quot;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Model&quot;</span>, <span class="st">&quot;Mean Cook&#39;s Distance&quot;</span>, <span class="st">&quot;Standard Deviation&quot;</span>, <span class="st">&quot;Number of Influential Observations&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract indices and Cook&#39;s distances above threshold</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>indices_above_threshold <span class="ot">&lt;-</span> <span class="fu">lapply</span>(cooks_d, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;Index&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>unique_indices <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(indices_above_threshold))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>sorted_unique_indices <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">unlist</span>(indices_above_threshold)))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>n_influential <span class="ot">&lt;-</span> <span class="fu">length</span>(sorted_unique_indices)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>dispersion <span class="ot">&lt;-</span> <span class="fu">sd</span>(<span class="fu">table</span>(<span class="fu">unlist</span>(indices_above_threshold)))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute mean and standard deviation of Cook&#39;s distances above threshold</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>cooks_values_above_threshold <span class="ot">&lt;-</span> <span class="fu">lapply</span>(cooks_d, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;CooksD&quot;</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>mean_above_threshold <span class="ot">&lt;-</span> <span class="fu">sapply</span>(cooks_values_above_threshold, mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>sd_above_threshold <span class="ot">&lt;-</span> <span class="fu">sapply</span>(cooks_values_above_threshold, sd, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Get sorted unique indices of influential observations</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">seq_along</span>(lmrob_fits),</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">unlist</span>(mean_above_threshold),</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd =</span> <span class="fu">unlist</span>(sd_above_threshold),</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">n =</span> <span class="fu">sapply</span>(cooks_d, nrow),</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">NULL</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> caption_text,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> column_names</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">footnote</span>(</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">footnote_text</span>(unique_indices, cooks_threshold, dispersion),</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote_as_chunk =</span> <span class="cn">TRUE</span>, <span class="at">escape =</span> <span class="cn">FALSE</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Summary of influential observations detected by Cook’s distance
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Model
+</th>
+<th style="text-align:right;">
+Mean Cook’s Distance
+</th>
+<th style="text-align:right;">
+Standard Deviation
+</th>
+<th style="text-align:right;">
+Number of Influential Observations
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.0042
+</td>
+<td style="text-align:right;">
+0.0018
+</td>
+<td style="text-align:right;">
+55
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0043
+</td>
+<td style="text-align:right;">
+0.0020
+</td>
+<td style="text-align:right;">
+69
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0.0043
+</td>
+<td style="text-align:right;">
+0.0018
+</td>
+<td style="text-align:right;">
+62
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0.0044
+</td>
+<td style="text-align:right;">
+0.0020
+</td>
+<td style="text-align:right;">
+65
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0.0048
+</td>
+<td style="text-align:right;">
+0.0022
+</td>
+<td style="text-align:right;">
+63
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0.0044
+</td>
+<td style="text-align:right;">
+0.0019
+</td>
+<td style="text-align:right;">
+78
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0.0050
+</td>
+<td style="text-align:right;">
+0.0027
+</td>
+<td style="text-align:right;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.0050
+</td>
+<td style="text-align:right;">
+0.0027
+</td>
+<td style="text-align:right;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.0050
+</td>
+<td style="text-align:right;">
+0.0029
+</td>
+<td style="text-align:right;">
+82
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> A total of
+164 unique and influential observations were observed across all the
+models. Cook’s distance measures the influence of each observation on
+the model. Observations with Cook’s distance greater than 0.003 were
+considered influential. The frequency of these influential observations
+varied across models, with a standard deviation of 2.742.
+</td>
+</tr>
+</tfoot>
+</table>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>data_2<span class="sc">$</span>influential <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>data_2<span class="sc">$</span>influential[sorted_unique_indices] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">save_rds</span>(data_2)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lmrob_fits <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map2</span>(<span class="fu">beautify_names</span>(<span class="fu">names</span>(.)), <span class="sc">~</span> <span class="fu">leverage_plot</span>(.x, .y)) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> ., <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figure-html5/leverage_plots-1.svg" alt="Leverage plots for influential observations" width="2160" background-color:transparent />
+<p class="caption">
+Leverage plots for influential observations
+</p>
+</div>
+<!-- The Cook's distance and leverage plots flag a few potentially influential observations in some of the models. Researchers should carefully examine these points and consider sensitivity analyses to assess their impact on the results. -->
+<p>Table 5 provides a summary of influential observations detected by
+Cook’s distance. The mean Cook’s distance and standard deviation of
+influential observations are reported for each model. The number of
+influential observations varied across models, with a total of 164
+unique and influential observations observed across all models. The
+Cook’s distance measures the influence of each observation on the model,
+with observations exceeding 0.00277 considered influential.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(data_2, influential) <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    dhd_index, dhd_kcal_intake, woman, age, smoking_status,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    education_cat, occupation_rec, household_income_eq_rec,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    difficulty_paying_regular_bills, difficulty_living_from_income,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    financial_difficulties, n_members_household, n_children_household,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    bool_children_household, n_adults_household, home_ownership,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    normal_week, crowding, n_bedrooms, has_partner, education_partner_cat,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    occupation_partner_rec, education_mother_cat, occupation_mother_rec,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    education_father_cat, occupation_father_rec</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">beautify_names</span>(<span class="fu">names</span>(.))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="fu">paste0</span>(<span class="st">&quot;Descriptive Statistics of Influential Observations (n = &quot;</span>, <span class="fu">nrow</span>(.), <span class="st">&quot;)&quot;</span>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<table style="NAborder-bottom: 0;">
+<caption>
+Descriptive Statistics of Influential Observations (n = 164)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(n\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\bar{x}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\text{min}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\text{max}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(sd\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\text{skew}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\text{kurt}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(SE\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(\text{Normality}^{\dagger}\)</span>
+</th>
+<th style="text-align:center;">
+<span class="math inline">\(p\)</span>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+DHD Index
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+89.794
+</td>
+<td style="text-align:center;">
+39.4
+</td>
+<td style="text-align:center;">
+142.9
+</td>
+<td style="text-align:center;">
+30.949
+</td>
+<td style="text-align:center;">
+0.081
+</td>
+<td style="text-align:center;">
+-1.627
+</td>
+<td style="text-align:center;">
+2.417
+</td>
+<td style="text-align:center;">
+0.885
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DHD Kcal Intake
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1607.541
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+7956.56
+</td>
+<td style="text-align:center;">
+838.122
+</td>
+<td style="text-align:center;">
+3.144
+</td>
+<td style="text-align:center;">
+19.431
+</td>
+<td style="text-align:center;">
+65.446
+</td>
+<td style="text-align:center;">
+0.782
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Woman
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.494
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0.501
+</td>
+<td style="text-align:center;">
+0.024
+</td>
+<td style="text-align:center;">
+-2.012
+</td>
+<td style="text-align:center;">
+0.039
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+43.159
+</td>
+<td style="text-align:center;">
+18
+</td>
+<td style="text-align:center;">
+65
+</td>
+<td style="text-align:center;">
+14.553
+</td>
+<td style="text-align:center;">
+-0.164
+</td>
+<td style="text-align:center;">
+-1.462
+</td>
+<td style="text-align:center;">
+1.136
+</td>
+<td style="text-align:center;">
+0.913
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Smoking Status
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.726
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+0.801
+</td>
+<td style="text-align:center;">
+0.528
+</td>
+<td style="text-align:center;">
+-1.259
+</td>
+<td style="text-align:center;">
+0.063
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Education Category
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+2.238
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.774
+</td>
+<td style="text-align:center;">
+-0.432
+</td>
+<td style="text-align:center;">
+-1.225
+</td>
+<td style="text-align:center;">
+0.06
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Occupation (recoded)
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+2.396
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.652
+</td>
+<td style="text-align:center;">
+-0.606
+</td>
+<td style="text-align:center;">
+-0.656
+</td>
+<td style="text-align:center;">
+0.051
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Equivalized Household Income
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+2.317
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+1.061
+</td>
+<td style="text-align:center;">
+0.267
+</td>
+<td style="text-align:center;">
+-1.165
+</td>
+<td style="text-align:center;">
+0.083
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Difficulty Paying Regular Bills
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.47
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+0.631
+</td>
+<td style="text-align:center;">
+0.989
+</td>
+<td style="text-align:center;">
+-0.116
+</td>
+<td style="text-align:center;">
+0.049
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Difficulty Living from Income
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.037
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.919
+</td>
+<td style="text-align:center;">
+0.305
+</td>
+<td style="text-align:center;">
+-1.061
+</td>
+<td style="text-align:center;">
+0.072
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Financial Difficulties
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.476
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+1.39
+</td>
+<td style="text-align:center;">
+0.384
+</td>
+<td style="text-align:center;">
+-1.29
+</td>
+<td style="text-align:center;">
+0.109
+</td>
+<td style="text-align:center;">
+0.846
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Household Size
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.337
+</td>
+<td style="text-align:center;">
+0.25
+</td>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+0.745
+</td>
+<td style="text-align:center;">
+1.024
+</td>
+<td style="text-align:center;">
+1.353
+</td>
+<td style="text-align:center;">
+0.058
+</td>
+<td style="text-align:center;">
+0.858
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of Children in Household
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.628
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+0.859
+</td>
+<td style="text-align:center;">
+0.785
+</td>
+<td style="text-align:center;">
+-1.192
+</td>
+<td style="text-align:center;">
+0.067
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Children in Household (Yes/No)
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.75
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0.434
+</td>
+<td style="text-align:center;">
+-1.144
+</td>
+<td style="text-align:center;">
+-0.695
+</td>
+<td style="text-align:center;">
+0.034
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of Adults in Household
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.829
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+0.74
+</td>
+<td style="text-align:center;">
+0.821
+</td>
+<td style="text-align:center;">
+0.816
+</td>
+<td style="text-align:center;">
+0.058
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Home Ownership
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.409
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0.493
+</td>
+<td style="text-align:center;">
+0.369
+</td>
+<td style="text-align:center;">
+-1.875
+</td>
+<td style="text-align:center;">
+0.039
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Normal Week
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.854
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0.355
+</td>
+<td style="text-align:center;">
+-1.983
+</td>
+<td style="text-align:center;">
+1.944
+</td>
+<td style="text-align:center;">
+0.028
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Crowding
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+3.077
+</td>
+<td style="text-align:center;">
+0.5
+</td>
+<td style="text-align:center;">
+16
+</td>
+<td style="text-align:center;">
+2.99
+</td>
+<td style="text-align:center;">
+2.338
+</td>
+<td style="text-align:center;">
+5.973
+</td>
+<td style="text-align:center;">
+0.234
+</td>
+<td style="text-align:center;">
+0.706
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of Bedrooms
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+2.756
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+6
+</td>
+<td style="text-align:center;">
+1.092
+</td>
+<td style="text-align:center;">
+0.518
+</td>
+<td style="text-align:center;">
+0.048
+</td>
+<td style="text-align:center;">
+0.085
+</td>
+<td style="text-align:center;">
+0.907
+</td>
+<td style="text-align:center;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Has Partner
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+0.61
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0.489
+</td>
+<td style="text-align:center;">
+-0.446
+</td>
+<td style="text-align:center;">
+-1.812
+</td>
+<td style="text-align:center;">
+0.038
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Education Partner Category
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.293
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+1.213
+</td>
+<td style="text-align:center;">
+0.229
+</td>
+<td style="text-align:center;">
+-1.54
+</td>
+<td style="text-align:center;">
+0.095
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Occupation Partner (recoded)
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.5
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+1.289
+</td>
+<td style="text-align:center;">
+-0.111
+</td>
+<td style="text-align:center;">
+-1.709
+</td>
+<td style="text-align:center;">
+0.101
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Education Mother Category
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.707
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.836
+</td>
+<td style="text-align:center;">
+0.586
+</td>
+<td style="text-align:center;">
+-1.328
+</td>
+<td style="text-align:center;">
+0.065
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Occupation Mother (recoded)
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.963
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.843
+</td>
+<td style="text-align:center;">
+0.068
+</td>
+<td style="text-align:center;">
+-1.597
+</td>
+<td style="text-align:center;">
+0.066
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Education Father Category
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+1.726
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.831
+</td>
+<td style="text-align:center;">
+0.543
+</td>
+<td style="text-align:center;">
+-1.35
+</td>
+<td style="text-align:center;">
+0.065
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Occupation Father (recoded)
+</td>
+<td style="text-align:center;">
+164
+</td>
+<td style="text-align:center;">
+2.335
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+0.676
+</td>
+<td style="text-align:center;">
+-0.516
+</td>
+<td style="text-align:center;">
+-0.792
+</td>
+<td style="text-align:center;">
+0.053
+</td>
+<td style="text-align:center;">
+—
+</td>
+<td style="text-align:center;">
+—
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span> <sup></sup> Shapiro-Wilk
+Test<span class="math inline">\(^{\dagger}\)</span>
+</td>
+</tr>
+</tfoot>
+</table>
+
+</main>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+document.addEventListener("DOMContentLoaded", function(event) {
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+  document.getElementsByTagName("head")[0].appendChild(script);
+});
+</script>
+
+</body>
+</html>
